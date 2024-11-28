@@ -3,6 +3,8 @@ import json
 from config import MSK_CLUSTER_ARN, BROKER_ONE, BROKER_TWO
 from msk_utils import create_kafka_cluster_with_default_access, list_running_kafka_clusters, get_bootstrap_brokers
 from kafka_utils import create_kafka_topic, create_producer, create_consumer, list_kafka_topics
+from run_consumer import run_consumer
+from run_producer import run_producer
 
 topic_name = "topic_dynamic_configurations"
 
@@ -41,21 +43,9 @@ def main():
         create_kafka_topic(brokers, topic_name)
     else:
         print(f' - topic selected: {topic_name}')
-
-    # # Step 3: Create Kafka Producer and Send Data
-    # producer = create_producer(brokers)
-    # for i in range(10):
-    #     message = {'message_number': i}
-    #     producer.send(topic_name, json.dumps(message).encode('utf-8'))
-    #     print(f"Sent: {message}")
-    # producer.flush()
-
-    # # Step 4: Create Kafka Consumer and Read Data
-    # consumer = create_consumer(brokers, topic_name)
-    # for message in consumer:
-    #     print(f"Received: {json.loads(message.value.decode('utf-8'))}")
-    #     if message.offset == 9:
-    #         break  # Stop after 10 messages for this example
+        
+    run_producer(brokers, topic_name)
+    run_consumer(brokers, topic_name)
 
 if __name__ == "__main__":
     main()
