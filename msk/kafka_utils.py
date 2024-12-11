@@ -43,7 +43,7 @@ def create_kafka_topic(brokers, topic_name):
         print(f"An error occurred: {e}")
 
 
-def create_producer(brokers):
+def create_producer(brokers, unique_id):
     """
     Create a Kafka producer with SASL/OAUTHBEARER authentication and default performance configurations.
     """
@@ -53,7 +53,7 @@ def create_producer(brokers):
             security_protocol='SASL_SSL',
             sasl_mechanism='OAUTHBEARER',
             sasl_oauth_token_provider=tp,
-            client_id=socket.gethostname(),
+            client_id=f"{socket.gethostname()}_{unique_id}",
             value_serializer=lambda v: json.dumps(v).encode('utf-8'),
             batch_size=DEFAULT_BATCH_SIZE,
             linger_ms=DEFAULT_LINGER_MS,
@@ -61,10 +61,10 @@ def create_producer(brokers):
             max_request_size=DEFAULT_MAX_REQUEST_SIZE,
             acks=DEFAULT_ACKS,
         )
-        print("Kafka Producer created successfully with default configurations.")
+        print(f"Kafka Producer {unique_id} created successfully.")
         return producer
     except Exception as e:
-        print(f"Failed to create Kafka Producer: {e}")
+        print(f"Failed to create Kafka Producer {unique_id}: {e}")
         return None
 
 

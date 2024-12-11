@@ -4,7 +4,7 @@ from config import MSK_CLUSTER_ARN, BROKER_ONE, BROKER_TWO
 from msk_utils import create_kafka_cluster_with_default_access, list_running_kafka_clusters, get_bootstrap_brokers
 from kafka_utils import create_kafka_topic, create_producer, create_consumer, list_kafka_topics
 from run_consumer import run_consumer
-from run_producer import run_producer
+from run_producer import run_producer, run_producer_cluster
 
 topic_name = "topic_dynamic_configurations"
 
@@ -44,7 +44,7 @@ def main():
     else:
         print(f' - topic selected: {topic_name}')
         
-    run_producer(brokers, topic_name)
+    run_producer_cluster(brokers, topic_name, num_producers=5)
     run_consumer(brokers, topic_name)
 
 if __name__ == "__main__":
