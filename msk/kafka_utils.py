@@ -4,12 +4,13 @@ from kafka import KafkaProducer, KafkaConsumer
 from kafka.admin import KafkaAdminClient, NewTopic
 from kafka.errors import KafkaError
 from msk_token_provider import MSKTokenProvider
-from kafka_config import (  # Import the default configurations
+from kafka_config import ( 
     DEFAULT_BATCH_SIZE, DEFAULT_LINGER_MS, DEFAULT_COMPRESSION_TYPE,
     DEFAULT_MAX_REQUEST_SIZE, DEFAULT_ACKS,
     DEFAULT_FETCH_MAX_BYTES, DEFAULT_MAX_POLL_RECORDS,
     DEFAULT_SESSION_TIMEOUT_MS, DEFAULT_HEARTBEAT_INTERVAL_MS,
 )
+from config import BROKERS
 
 tp = MSKTokenProvider()
 
@@ -48,19 +49,22 @@ def create_producer(brokers, unique_id):
     Create a Kafka producer with SASL/OAUTHBEARER authentication and default performance configurations.
     """
     try:
-        producer = KafkaProducer(
-            bootstrap_servers=','.join(brokers),
-            security_protocol='SASL_SSL',
-            sasl_mechanism='OAUTHBEARER',
-            sasl_oauth_token_provider=tp,
-            client_id=f"{socket.gethostname()}_{unique_id}",
-            value_serializer=lambda v: json.dumps(v).encode('utf-8'),
-            batch_size=DEFAULT_BATCH_SIZE,
-            linger_ms=DEFAULT_LINGER_MS,
-            compression_type=DEFAULT_COMPRESSION_TYPE,
-            max_request_size=DEFAULT_MAX_REQUEST_SIZE,
-            acks=DEFAULT_ACKS,
-        )
+        if not BROKERS:
+            producer = KafkaProducer(
+                bootstrap_servers=','.join(brokers),
+                security_protocol='SASL_SSL',
+                sasl_mechanism='OAUTHBEARER',
+                sasl_oauth_token_provider=tp,
+                client_id=f"{socket.gethostname()}_{unique_id}",
+                value_serializer=lambda v: json.dumps(v).encode('utf-8'),
+                batch_size=DEFAULT_BATCH_SIZE,
+                linger_ms=DEFAULT_LINGER_MS,
+                compression_type=DEFAULT_COMPRESSION_TYPE,
+                max_request_size=DEFAULT_MAX_REQUEST_SIZE,
+                acks=DEFAULT_ACKS,
+            )
+        else:
+            producer = KafkaProducer(bootstrap_servers=BROKERS)
         print(f"Kafka Producer {unique_id} created successfully.")
         return producer
     except Exception as e:
@@ -73,22 +77,25 @@ def create_consumer(brokers, topic_name):
     Create a Kafka consumer with SASL/OAUTHBEARER authentication and default performance configurations.
     """
     try:
-        consumer = KafkaConsumer(
-            topic_name,
-            bootstrap_servers=','.join(brokers),
-            security_protocol='SASL_SSL',
-            sasl_mechanism='OAUTHBEARER',
-            sasl_oauth_token_provider=tp,
-            client_id=socket.gethostname(),
-            group_id="my-group",
-            value_deserializer=lambda v: json.loads(v.decode('utf-8')),
-            auto_offset_reset="earliest",
-            enable_auto_commit=True,
-            fetch_max_bytes=DEFAULT_FETCH_MAX_BYTES,
-            max_poll_records=DEFAULT_MAX_POLL_RECORDS,
-            session_timeout_ms=DEFAULT_SESSION_TIMEOUT_MS,
-            heartbeat_interval_ms=DEFAULT_HEARTBEAT_INTERVAL_MS,
-        )
+        if not BROKERS:
+            consumer = KafkaConsumer(
+                topic_name,
+                bootstrap_servers=','.join(brokers),
+                security_protocol='SASL_SSL',
+                sasl_mechanism='OAUTHBEARER',
+                sasl_oauth_token_provider=tp,
+                client_id=socket.gethostname(),
+                group_id="my-group",
+                value_deserializer=lambda v: json.loads(v.decode('utf-8')),
+                auto_offset_reset="earliest",
+                enable_auto_commit=True,
+                fetch_max_bytes=DEFAULT_FETCH_MAX_BYTES,
+                max_poll_records=DEFAULT_MAX_POLL_RECORDS,
+                session_timeout_ms=DEFAULT_SESSION_TIMEOUT_MS,
+                heartbeat_interval_ms=DEFAULT_HEARTBEAT_INTERVAL_MS,
+            )
+        else:
+            consumer = KafkaConsumer(topic_name, bootstrap_servers=BROKERS, group_id='my-kafka-group', auto_offset_reset='earliest')
         print("Kafka Consumer created successfully with default configurations.")
         return consumer
     except Exception as e:

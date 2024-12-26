@@ -1,8 +1,4 @@
 from kafka_utils import create_consumer
-from kafka_config import (  # Import configurations
-    DEFAULT_FETCH_MAX_BYTES, DEFAULT_MAX_POLL_RECORDS,
-    DEFAULT_SESSION_TIMEOUT_MS, DEFAULT_HEARTBEAT_INTERVAL_MS,
-)
 
 def run_consumer(brokers, topic_name):
     """

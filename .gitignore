@@ -1,3 +1,4 @@
 /misc
 /.env
 /kafka.env
+/msk/__pycache__
