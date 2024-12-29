@@ -2,4 +2,4 @@
 /.env
 /kafka.env
 /*/__pycache__
-/log_files/*
+/msk/log_files/*
