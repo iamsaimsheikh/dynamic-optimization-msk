@@ -1,8 +1,10 @@
+version: '3.8'
+
 services:
-  # Zookeeper, single node
   zookeeper:
-    image: wurstmeister/zookeeper:latest
+    image: bitnami/zookeeper:latest
     environment:
+      ALLOW_ANONYMOUS_LOGIN: "yes"
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     ports:
@@ -25,6 +27,8 @@ services:
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka1:29092,EXTERNAL://localhost:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+    volumes:
+      - ./log4j2.properties:/etc/kafka/log4j2.properties
 
   # Kafka node 2
   kafka2:
@@ -41,6 +45,8 @@ services:
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka2:29093,EXTERNAL://localhost:9093
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+    volumes:
+      - ./log4j2.properties:/etc/kafka/log4j2.properties
 
   # Kafka node 3
   kafka3:
@@ -57,6 +63,8 @@ services:
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka3:29094,EXTERNAL://localhost:9094
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+    volumes:
+      - ./log4j2.properties:/etc/kafka/log4j2.properties
 
   # Zoonavigator
   zoonavigator:

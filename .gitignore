@@ -1,4 +1,5 @@
 /misc
 /.env
 /kafka.env
-/msk/__pycache__
+/*/__pycache__
+/log_files/*
