@@ -8,14 +8,16 @@ boto3=1.35.49=pypi_0
 botocore=1.35.49=pypi_0
 brotli-python=1.0.9=py310h313beb8_8
 bzip2=1.0.8=h80987f9_6
-ca-certificates=2024.9.24=hca03da5_0
+ca-certificates=2024.11.26=hca03da5_0
 click=8.1.7=py310hca03da5_0
 confluent-kafka=2.6.1=pypi_0
+et_xmlfile=1.1.0=py310hca03da5_0
 jmespath=1.0.1=py310hca03da5_0
 kafka-python=2.0.2=pypi_0
 libcxx=14.0.6=h848a8c0_0
 libffi=3.4.4=hca03da5_1
 ncurses=6.4=h313beb8_0
+openpyxl=3.1.5=py310h80987f9_0
 openssl=3.0.15=h80987f9_0
 pip=24.3.1=pypi_0
 pysocks=1.7.1=py310hca03da5_0
