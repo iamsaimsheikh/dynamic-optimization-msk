@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker
-from config import Config
+from database.config import Config
 
 DATABASE_URL = Config.SQLALCHEMY_DATABASE_URI
 
@@ -20,5 +20,7 @@ def get_db():
         
 def init_db():
     from models.checkpoint_model import CheckpointModel
+    from models.consumer_log_model import ConsumerLogModel
+    from models.producer_log_model import ProducerLogModel
     Base.metadata.create_all(bind=engine)
         

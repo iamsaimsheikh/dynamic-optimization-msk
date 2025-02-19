@@ -1,3 +1,9 @@
+import sys
+import os
+
+# Dynamically add the project root directory to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 import time
 import json
 from config import MSK_CLUSTER_ARN, BROKER_ONE, BROKER_TWO, BROKERS, NUM_BROKERS
