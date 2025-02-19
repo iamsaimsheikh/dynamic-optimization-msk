@@ -10,7 +10,7 @@ def create_kafka_cluster_with_default_access():
     """
     response = msk_client.create_cluster(
         ClusterName='MyKafkaCluster',
-        KafkaVersion='2.8.2.tiered',  # Minimum version supporting dynamic configs
+        KafkaVersion='2.8.2.tiered', 
         NumberOfBrokerNodes=int(NUM_BROKERS),
         BrokerNodeGroupInfo={
             'InstanceType': 'kafka.t3.small',
@@ -20,7 +20,7 @@ def create_kafka_cluster_with_default_access():
         ClientAuthentication={
             'Sasl': {
                 'Iam': {
-                    'Enabled': True  # Enable SASL/IAM authentication
+                    'Enabled': True 
                 }
             }
         },
