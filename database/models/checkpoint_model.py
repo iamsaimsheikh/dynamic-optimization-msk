@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, DateTime
-from db import Base
+from database.db import Base
 
 class CheckpointModel(Base):
     __tablename__ = "checkpoint"

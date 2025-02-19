@@ -56,7 +56,7 @@ for col_num, header in enumerate(consumer_headers, 1):
     col_letter = get_column_letter(col_num)
     consumer_ws[f"{col_letter}1"] = header
 
-def log_producer_operation(producer_id, action, message, success=True):
+def log_producer_operation(producer_id, action, message, success=True, buffer = None):
     """
     Log producer actions to a unified JSON log file, Excel file, and console.
     """
@@ -85,6 +85,8 @@ def log_producer_operation(producer_id, action, message, success=True):
 
     # Log to the JSON file
     logging.info(json.dumps(log_entry))
+    if buffer is not None:
+        buffer.add_log(log_entry)
 
     # Log to the Excel file (Producer logs)
     row = [
@@ -95,7 +97,7 @@ def log_producer_operation(producer_id, action, message, success=True):
     producer_ws.append(row)
     producer_wb.save(producer_xlsx_log_file_path)
 
-def log_consumer_operation(consumer_id, action, message, success=True):
+def log_consumer_operation(consumer_id, action, message, success=True, buffer = None):
     """
     Log consumer actions to a unified JSON log file, Excel file, and console.
     """
@@ -114,11 +116,19 @@ def log_consumer_operation(consumer_id, action, message, success=True):
         "case_id": thread_id,
         "action": action,
         "consumer_id": consumer_id,
+        "batch_size": DEFAULT_BATCH_SIZE,
+        "linger_ms": DEFAULT_LINGER_MS,
+        "compression_type": DEFAULT_COMPRESSION_TYPE,
+        "max_request_size": DEFAULT_MAX_REQUEST_SIZE,
+        "acks": DEFAULT_ACKS,
         "message_details": message_details
     }
 
     # Log to the JSON file
     logging.info(json.dumps(log_entry))
+    
+    if buffer is not None:
+        buffer.add_log(log_entry)
 
     # Log to the Excel file (Consumer logs)
     row = [
