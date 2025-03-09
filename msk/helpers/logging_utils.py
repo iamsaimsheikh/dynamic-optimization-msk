@@ -9,6 +9,12 @@ from kafka_config import (
     DEFAULT_BATCH_SIZE, DEFAULT_LINGER_MS, DEFAULT_COMPRESSION_TYPE,
     DEFAULT_MAX_REQUEST_SIZE, DEFAULT_ACKS
 )
+from helpers.log_handler import LogHandler
+
+list_handler = LogHandler()
+list_handler.setFormatter(logging.Formatter(
+    '{"timestamp": "%(asctime)s", "level": "%(levelname)s", "thread_id": "%(thread)d", "case_id": "%(thread)d", "entity_name": "%(name)s", "action": "%(message)s"}'
+))
 
 # Path to the unified JSON log file and Excel log files
 json_log_file_path = "log_files/sys_logs.json"
@@ -22,13 +28,15 @@ os.makedirs(os.path.dirname(consumer_xlsx_log_file_path), exist_ok=True)
 
 # Set up logging for JSON file and console output
 logging.basicConfig(
-    level=logging.DEBUG,  # Log all levels
+    level=logging.DEBUG,
     format='{"timestamp": "%(asctime)s", "level": "%(levelname)s", "thread_id": "%(thread)d", "case_id": "%(thread)d", "entity_name": "%(name)s", "action": "%(message)s"},',
+    datefmt="%Y-%m-%d %H:%M:%S.%f",
     handlers=[
         logging.FileHandler(json_log_file_path, mode='a'),
-        # logging.StreamHandler()
+        list_handler
     ]
 )
+
 
 # Create workbooks and sheets for Excel logging
 producer_wb = Workbook()

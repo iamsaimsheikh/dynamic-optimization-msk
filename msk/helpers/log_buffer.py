@@ -1,15 +1,22 @@
 from sqlalchemy.orm import Session
 from database.models.consumer_log_model import ConsumerLogModel
 from database.models.producer_log_model import ProducerLogModel
+from database.models.sys_event_log_model import SysEventLogModel
 
 class LogBuffer:
     def __init__(self, db: Session, log_type: str, buffer_size: int):
         self.db = db
         self.log_type = log_type
         self.buffer_size = buffer_size
-        self.buffer = []  # Stores logs before flushing
+        self.buffer = []
+
+    def fix_timestamp(self, timestamp: str) -> str:
+        return timestamp.replace(',', '.') if ',' in timestamp else timestamp
 
     def add_log(self, log_entry: dict):
+        if 'timestamp' in log_entry:
+            log_entry['timestamp'] = self.fix_timestamp(log_entry['timestamp'])
+
         self.buffer.append(log_entry)
 
         if len(self.buffer) >= self.buffer_size:
@@ -24,8 +31,10 @@ class LogBuffer:
                 log_objects = [ConsumerLogModel(**log) for log in self.buffer]
             elif self.log_type == "producer":
                 log_objects = [ProducerLogModel(**log) for log in self.buffer]
+            elif self.log_type == "sys_event":
+                log_objects = [SysEventLogModel(**log) for log in self.buffer]
             else:
-                raise ValueError("Invalid log type. Must be 'consumer' or 'producer'.")
+                raise ValueError("Invalid log type. Must be 'consumer', 'producer', or 'sys_event'.")
 
             self.db.bulk_save_objects(log_objects)
             self.db.commit()

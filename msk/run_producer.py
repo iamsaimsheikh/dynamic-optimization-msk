@@ -11,7 +11,7 @@ from kafka_config import (
 from helpers.log_buffer import LogBuffer
 from database.models.producer_log_model import ProducerLogModel
 
-db_session = next(get_db())
+db_session = get_db()
 producer_log_buffer = LogBuffer(
     db=db_session, log_type="producer", buffer_size=250
 )
