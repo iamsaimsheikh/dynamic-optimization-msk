@@ -13,7 +13,7 @@ from helpers.log_buffer import LogBuffer
 from database.db import get_db
 from database.models.consumer_log_model import ConsumerLogModel
 
-db_session = next(get_db())
+db_session = get_db()
 consumer_log_buffer = LogBuffer(
     db=db_session, log_type="consumer", buffer_size=100
 )
