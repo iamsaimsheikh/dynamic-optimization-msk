@@ -58,9 +58,14 @@ async def get_job_status(job_id: str):
     result = await get_data_push_job_status(job_id)
     return result
 
-@router.post("/celonis/data-pools/{pool_id}/data-models/{data_model_id}/load")
-async def post_execute_data_model_load(pool_id: str,data_model_id: str):
+@router.post("/celonis/data-models/{data_model_id}/load")
+async def post_execute_data_model_load(data_model_id: str):
     """
     Trigger a Celonis Data Model Load Job.
     """
-    return await execute_data_model_load(pool_id, data_model_id)
+    result = await execute_data_model_load(data_model_id)
+
+    if "error" in result:
+        raise HTTPException(status_code=result["status_code"], detail=result["error"])
+
+    return result
