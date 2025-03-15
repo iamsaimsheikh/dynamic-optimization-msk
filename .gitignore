@@ -1,6 +1,7 @@
 /misc
 /.env
 /kafka.env
+/celonis.env
 /*/__pycache__
 /msk/log_files/*
 /*/*/__pycache__
