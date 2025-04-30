@@ -1,5 +1,6 @@
 import threading
 import time
+import json
 from kafka_utils import create_consumer
 from helpers.logging_utils import log_consumer_operation
 from kafka_config import (
@@ -10,19 +11,16 @@ from kafka_config import (
     DEFAULT_ACKS,
 )
 from helpers.log_buffer import LogBuffer
+from helpers.analytics_buffer import AnalyticsBuffer
 from database.db import get_db
 from database.models.consumer_log_model import ConsumerLogModel
 
-db_session = get_db()
-consumer_log_buffer = LogBuffer(
-    db=db_session, log_type="consumer", buffer_size=100
-)
 
+def consume_messages(brokers, topic_name, consumer_id, db_session, analytics_buffer):
+    consumer_log_buffer = LogBuffer(
+        db=db_session, log_type="consumer", buffer_size=100
+    )
 
-def consume_messages(brokers, topic_name, consumer_id):
-    """
-    Consume messages from Kafka topic for a given consumer.
-    """
     consumer = create_consumer(brokers, topic_name)
 
     if consumer:
@@ -35,17 +33,30 @@ def consume_messages(brokers, topic_name, consumer_id):
         )
 
         try:
-            # Listen for messages
             for message in consumer:
-                # Simulate processing the message (you can replace this with your own logic)
                 time.sleep(2)
+                message_id = None
+
+                try:
+                    message_value = message.value.decode("utf-8")
+                    parsed_value = json.loads(message_value)
+                    message_id = parsed_value.get('message_id', "None")
+                    print(f"[DEBUG] Message Payload (parsed): {parsed_value}")
+                except Exception as e:
+                    print(f"[DEBUG] Failed to parse message: {e}")
+                    message_value = str(message.value)
+
                 log_consumer_operation(
                     consumer_id,
                     "Received",
-                    f"Received message: {message.value}",
+                    f"Received message: {message_value}",
                     success=True,
                     buffer=consumer_log_buffer,
+                    message_id=message_id
                 )
+
+                if message_id:
+                    analytics_buffer.appendId(message_id)
 
         except Exception as e:
             log_consumer_operation(
@@ -66,20 +77,18 @@ def consume_messages(brokers, topic_name, consumer_id):
 
 
 def run_consumer_cluster(brokers, topic_name, num_consumers=5):
-    """
-    Run multiple consumer threads concurrently.
-    """
     threads = []
+    db_session = get_db()
+    analytics_buffer = AnalyticsBuffer(db=db_session, length=50)
 
-    # Create and start the consumer threads
     for i in range(num_consumers):
-        consumer_id = i + 1  # Each consumer gets a unique ID
+        consumer_id = i + 1
         thread = threading.Thread(
-            target=consume_messages, args=(brokers, topic_name, consumer_id)
+            target=consume_messages,
+            args=(brokers, topic_name, consumer_id, db_session, analytics_buffer)
         )
-        thread.daemon = True  # Daemon thread runs in the background
+        thread.daemon = True
         threads.append(thread)
         thread.start()
 
-    # Threads are running in the background; main thread can continue with other work
     print("Consumer cluster is running in the background.")

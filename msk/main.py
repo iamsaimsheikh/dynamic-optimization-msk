@@ -69,7 +69,7 @@ def main():
 
     else:
         # If brokers are already provided, run the producer and consumer clusters concurrently
-        producer_thread = threading.Thread(target=run_producer_cluster, args=(BROKERS, topic_name, 5))
+        producer_thread = threading.Thread(target=run_producer_cluster, args=(BROKERS, topic_name, 10))
         consumer_thread = threading.Thread(target=run_consumer_cluster, args=(BROKERS, topic_name, 2))
 
         producer_thread.daemon = True

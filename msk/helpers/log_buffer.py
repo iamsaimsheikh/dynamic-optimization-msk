@@ -33,6 +33,8 @@ class LogBuffer:
                 log_objects = [ProducerLogModel(**log) for log in self.buffer]
             elif self.log_type == "sys_event":
                 log_objects = [SysEventLogModel(**log) for log in self.buffer]
+            elif self.log_type == "urllib3.connectionpool":
+                log_objects = [SysEventLogModel(**log) for log in self.buffer]
             else:
                 raise ValueError("Invalid log type. Must be 'consumer', 'producer', or 'sys_event'.")
 
@@ -41,8 +43,10 @@ class LogBuffer:
             self.buffer.clear()
 
         except Exception as e:
-            self.db.rollback()
-            print(f"Error saving logs to DB: {e}")
+            print('rollback was called in log_buffer')
+            print(e)
+            return
+            # self.db.rollback()
 
     def __del__(self):
         self.flush()

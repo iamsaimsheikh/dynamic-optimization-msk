@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, BigInteger, String, TIMESTAMP
+from sqlalchemy import Column, Integer, BigInteger, String, TIMESTAMP, Boolean
 from database.db import Base
 
 class ConsumerLogModel(Base):
@@ -15,3 +15,6 @@ class ConsumerLogModel(Base):
     max_request_size = Column(Integer, nullable=False)
     acks = Column(String, nullable=False)
     message_details = Column(String, nullable=True)
+    message_id = Column(String, nullable=False)
+    is_analytics_processed = Column(Boolean, nullable=False, default=False)
+
