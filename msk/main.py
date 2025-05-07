@@ -1,5 +1,7 @@
 import sys
 import os
+from dotenv import load_dotenv
+load_dotenv(dotenv_path='../kafka.env')
 
 # Dynamically add the project root directory to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -12,6 +14,40 @@ from kafka_utils import create_kafka_topic, create_producer, create_consumer, li
 from run_consumer import run_consumer_cluster
 from run_producer import run_producer_cluster
 import threading
+import argparse
+
+parser = argparse.ArgumentParser(description="Kafka Config Runner")
+
+# Producer configs
+parser.add_argument("--batch-size", type=int, default=int(os.getenv("DEFAULT_BATCH_SIZE", 16384)))
+parser.add_argument("--linger-ms", type=int, default=int(os.getenv("DEFAULT_LINGER_MS", 5)))
+parser.add_argument("--compression-type", type=str, default=os.getenv("DEFAULT_COMPRESSION_TYPE", "gzip"))
+parser.add_argument("--max-request-size", type=int, default=int(os.getenv("DEFAULT_MAX_REQUEST_SIZE", 1048576)))
+parser.add_argument("--acks", type=str, default=os.getenv("DEFAULT_ACKS", "all"))
+
+# Consumer configs
+parser.add_argument("--fetch-max-bytes", type=int, default=int(os.getenv("DEFAULT_FETCH_MAX_BYTES", 52428800)))
+parser.add_argument("--max-poll-records", type=int, default=int(os.getenv("DEFAULT_MAX_POLL_RECORDS", 500)))
+parser.add_argument("--session-timeout-ms", type=int, default=int(os.getenv("DEFAULT_SESSION_TIMEOUT_MS", 30000)))
+parser.add_argument("--heartbeat-interval-ms", type=int, default=int(os.getenv("DEFAULT_HEARTBEAT_INTERVAL_MS", 30000)))
+
+args = parser.parse_args()
+
+# Store producer and consumer configs as dictionaries
+producer_config = {
+    "batch_size": args.batch_size,
+    "linger_ms": args.linger_ms,
+    "compression_type": args.compression_type,
+    "max_request_size": args.max_request_size,
+    "acks": args.acks,
+}
+
+consumer_config = {
+    "fetch_max_bytes": args.fetch_max_bytes,
+    "max_poll_records": args.max_poll_records,
+    "session_timeout_ms": args.session_timeout_ms,
+    "heartbeat_interval_ms": args.heartbeat_interval_ms,
+}
 
 topic_name = 'iot_topic'
 
@@ -69,8 +105,8 @@ def main():
 
     else:
         # If brokers are already provided, run the producer and consumer clusters concurrently
-        producer_thread = threading.Thread(target=run_producer_cluster, args=(BROKERS, topic_name, 10))
-        consumer_thread = threading.Thread(target=run_consumer_cluster, args=(BROKERS, topic_name, 2))
+        producer_thread = threading.Thread(target=run_producer_cluster, args=(BROKERS, topic_name, 10, producer_config))
+        consumer_thread = threading.Thread(target=run_consumer_cluster, args=(BROKERS, topic_name, 2, consumer_config))
 
         producer_thread.daemon = True
         consumer_thread.daemon = True

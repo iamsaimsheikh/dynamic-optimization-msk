@@ -5,70 +5,111 @@ from database.db import get_db
 from kafka_utils import create_producer
 from helpers.logging_utils import log_producer_operation
 from kafka_config import (
-    DEFAULT_BATCH_SIZE, DEFAULT_LINGER_MS, DEFAULT_COMPRESSION_TYPE,
-    DEFAULT_MAX_REQUEST_SIZE, DEFAULT_ACKS
+    DEFAULT_BATCH_SIZE,
+    DEFAULT_LINGER_MS,
+    DEFAULT_COMPRESSION_TYPE,
+    DEFAULT_MAX_REQUEST_SIZE,
+    DEFAULT_ACKS,
 )
 from helpers.log_buffer import LogBuffer
 from database.models.producer_log_model import ProducerLogModel
 from uuid import uuid4
 
 db_session = get_db()
-producer_log_buffer = LogBuffer(
-    db=db_session, log_type="producer", buffer_size=50
-)
+producer_log_buffer = LogBuffer(db=db_session, log_type="producer", buffer_size=10)
 
 
-def run_producer(brokers, topic_name, unique_id):
+def run_producer(brokers, topic_name, unique_id, producer_config={}):
     """
     Run a Kafka producer in a thread to send periodic messages.
     """
     try:
-        # Create producer
-        producer = create_producer(brokers, unique_id)
+        # Create producer with dynamic config
+        producer = create_producer(brokers, unique_id, producer_config)
         if not producer:
             error_message = "Producer initialization failed."
-            log_producer_operation(unique_id, "Failed", error_message, success=False, buffer = producer_log_buffer, message_id=None)
+            log_producer_operation(
+                unique_id,
+                "Failed",
+                error_message,
+                success=False,
+                buffer=producer_log_buffer,
+                message_id=None,
+            )
             return
 
-        producer_id = producer.config['client_id']
+        producer_id = producer.config["client_id"]
         thread_id = threading.get_ident()
-        log_producer_operation(producer_id, "Initialized", f"Producer initialized in thread {thread_id}", success=True, buffer = producer_log_buffer, message_id=None)
+        log_producer_operation(
+            producer_id,
+            "Initialized",
+            f"Producer initialized in thread {thread_id}",
+            success=True,
+            buffer=producer_log_buffer,
+            message_id=None,
+        )
 
         while True:
             message_id = uuid4().hex
+            # Pull values from config or fallback to defaults
+            batch_size = producer_config.get("batch_size", DEFAULT_BATCH_SIZE)
+            linger_ms = producer_config.get("linger_ms", DEFAULT_LINGER_MS)
+            compression_type = producer_config.get("compression_type", DEFAULT_COMPRESSION_TYPE)
+            max_request_size = producer_config.get("max_request_size", DEFAULT_MAX_REQUEST_SIZE)
+            acks = producer_config.get("acks", DEFAULT_ACKS)
+
             message = {
                 "producer_id": producer_id,
-                "batch_size": DEFAULT_BATCH_SIZE,
-                "linger_ms": DEFAULT_LINGER_MS,
-                "compression_type": DEFAULT_COMPRESSION_TYPE,
-                "max_request_size": DEFAULT_MAX_REQUEST_SIZE,
-                "acks": DEFAULT_ACKS,
-                "message_id": message_id
+                "batch_size": batch_size,
+                "linger_ms": linger_ms,
+                "compression_type": compression_type,
+                "max_request_size": max_request_size,
+                "acks": acks,
+                "message_id": message_id,
             }
 
             try:
-                message_bytes = json.dumps(message).encode('utf-8')
+                message_bytes = json.dumps(message).encode("utf-8")
                 producer.send(topic_name, value=message_bytes)
                 producer.flush()
-                log_producer_operation(producer_id, "Sent", message, success=True, buffer = producer_log_buffer, message_id=message_id)
+                log_producer_operation(
+                    producer_id,
+                    "Sent",
+                    message,
+                    success=True,
+                    buffer=producer_log_buffer,
+                    message_id=message_id,
+                )
             except Exception as e:
                 error_message = str(e)
-                log_producer_operation(producer_id, "Failed", error_message, success=False, buffer = producer_log_buffer, message_id= message_id)
+                log_producer_operation(
+                    producer_id,
+                    "Failed",
+                    error_message,
+                    success=False,
+                    buffer=producer_log_buffer,
+                    message_id=message_id,
+                )
 
             # Control the message frequency
             time.sleep(2)
 
     except Exception as e:
-        log_producer_operation(unique_id, "Failed", str(e), success=False, message_id=None)
+        log_producer_operation(
+            unique_id, "Failed", str(e), success=False, message_id=None
+        )
 
-def run_producer_cluster(brokers, topic_name, num_producers=5):
+
+def run_producer_cluster(brokers, topic_name, num_producers=5, producer_config={}):
     """
     Run multiple producer threads concurrently.
     """
     threads = []
     for i in range(num_producers):
         unique_id = f"producer_{i+1}"
-        thread = threading.Thread(target=run_producer, args=(brokers, topic_name, unique_id))
+        thread = threading.Thread(
+            target=run_producer, args=(brokers, topic_name, unique_id, producer_config)
+        )
         thread.daemon = True  # Daemon thread runs in the background
         threads.append(thread)
         thread.start()

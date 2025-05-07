@@ -10,12 +10,13 @@ import docker
 
 
 class AnalyticsBuffer:
-    def __init__(self, db: Session, length: int = 100):
+    def __init__(self, db: Session, length: int = 100, consumer_configs: list = {}):
         self.length = length
         self.db = db
         self.buffer = []
         self.lock = threading.Lock()
         self.docker_client = docker.from_env()
+        self.consumer_configs = consumer_configs
 
     def appendId(self, log_id: str):
         with self.lock:
@@ -173,6 +174,9 @@ class AnalyticsBuffer:
         uptime_cost_usd = 0.21 / 3600 * time_window_sec
         per_message_cost_usd = 0.01 / 1_000_000
         total_cost_usd = uptime_cost_usd + (total_messages * per_message_cost_usd)
+        
+        print("here")
+        print(self.consumer_configs)
 
         stats_model = KafkaBatchStatsModel(
             id=uuid.uuid4(),
@@ -193,8 +197,14 @@ class AnalyticsBuffer:
             msk_uptime_cost_usd=round(uptime_cost_usd, 5),
             avg_cpu_usage=avg_cpu,
             avg_ram_usage=avg_ram,
+            conf_fetch_max_bytes= self.consumer_configs['fetch_max_bytes'],
+            conf_max_poll_records = self.consumer_configs['max_poll_records'],
+            conf_session_timeout_ms = self.consumer_configs['session_timeout_ms'],
+            conf_heartbeat_interval_ms = self.consumer_configs['heartbeat_interval_ms'],
             created_at=datetime.utcnow(),
         )
+        
+        print(stats_model)
 
         try:
             self.db.add(stats_model)
