@@ -12,10 +12,16 @@ class KafkaBatchStatsModel(Base):
     average_latency_ms = Column(Float, nullable=True)
     average_throughput_mps = Column(Float, nullable=True)
 
-    average_linger_ms = Column(Float, nullable=True)
-    average_max_request_size = Column(Float, nullable=True)
-    average_acks = Column(Float, nullable=True)
-    average_producer_batch_size = Column(Float, nullable=True)
+    conf_linger_ms = Column(Float, nullable=True)
+    conf_max_request_size = Column(Float, nullable=True)
+    conf_acks = Column(Float, nullable=True)
+    conf_batch_size = Column(Float, nullable=True)
+
+    # Consumer Configurations
+    conf_fetch_max_bytes = Column(Integer, nullable=True)
+    conf_max_poll_records = Column(Integer, nullable=True)
+    conf_session_timeout_ms = Column(Integer, nullable=True)
+    conf_heartbeat_interval_ms = Column(Integer, nullable=True)
 
     total_messages = Column(Integer, nullable=True)
     total_cost_usd = Column(Float, nullable=True)
