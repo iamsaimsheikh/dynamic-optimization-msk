@@ -1,6 +1,6 @@
 run:
 	python msk/main.py
-	
+
 makemigration:
 	alembic revision --autogenerate -m "$(name)"
 
@@ -15,13 +15,14 @@ initdb:
 
 save-requirements:
 	pip freeze > requirements.txt
-	conda list --explicit > conda-requirement.txt
+	conda list --explicit > conda-requirements.txt
 
 docker-up:
 	docker-compose up -d
 
 run-api:
-	python celonis_api/main.py
+	uvicorn celonis_api.main:app --host 0.0.0.0 --port 8000 --reload
+
 
 start-all:
 	make docker-up && make run && make run-api
