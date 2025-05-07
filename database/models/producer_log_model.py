@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, TIMESTAMP, BigInteger
+from sqlalchemy import Column, Integer, String, TIMESTAMP, BigInteger, Boolean
 from database.db import Base
 
 class ProducerLogModel(Base):
@@ -15,3 +15,5 @@ class ProducerLogModel(Base):
     max_request_size = Column(Integer, nullable=False)
     acks = Column(String, nullable=False)
     message_details = Column(String, nullable=True)
+    message_id = Column(String, nullable=False)
+    is_analytics_processed = Column(Boolean, nullable=False, default=False)

@@ -1,3 +1,4 @@
+aiofiles==24.1.0
 alembic==1.14.1
 annotated-types @ file:///home/conda/feedstock_root/build_artifacts/annotated-types_1733247046149/work
 anyio @ file:///home/conda/feedstock_root/build_artifacts/anyio_1736174388474/work
@@ -15,6 +16,7 @@ charset-normalizer==3.4.1
 click @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_61srkg7e2e/croot/click_1698129815327/work
 confluent-kafka==2.6.1
 dnspython @ file:///home/conda/feedstock_root/build_artifacts/dnspython_1733256735222/work
+docker==7.1.0
 drain3==0.9.1
 email_validator @ file:///home/conda/feedstock_root/build_artifacts/email-validator-meta_1733300719943/work
 et-xmlfile==1.1.0
@@ -51,16 +53,19 @@ nltk==3.9.1
 numpy==1.26.4
 openpyxl @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_96hhik4ygv/croot/openpyxl_1721752931204/work
 packaging==24.2
+pandas==2.2.3
 pillow==11.1.0
 psycopg2 @ file:///Users/runner/miniforge3/conda-bld/psycopg2-split_1727892642581/work
 pycparser @ file:///tmp/build/80754af9/pycparser_1636541352034/work
 pydantic @ file:///home/conda/feedstock_root/build_artifacts/pydantic_1733316837492/work
+pydantic-settings==2.8.1
 pydantic_core @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_bdqco4zmod/croot/pydantic-core_1734726070262/work
 Pygments @ file:///home/conda/feedstock_root/build_artifacts/pygments_1736243443484/work
 PySocks @ file:///Users/ktietz/ci_310/pysocks_1643961536721/work
 python-dateutil @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_66ud1l42_h/croot/python-dateutil_1716495741162/work
 python-dotenv @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_3ahu1_p9lb/croot/python-dotenv_1669132571851/work
 python-multipart @ file:///home/conda/feedstock_root/build_artifacts/python-multipart_1734420773152/work
+pytz==2025.2
 PyYAML @ file:///home/conda/feedstock_root/build_artifacts/pyyaml_1737454678094/work
 redis==5.2.1
 regex==2024.11.6
@@ -89,6 +94,7 @@ transformers==4.49.0
 typer==0.15.1
 typer-slim==0.15.1
 typing_extensions @ file:///home/conda/feedstock_root/build_artifacts/typing_extensions_1733188668063/work
+tzdata==2025.2
 urllib3 @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_06_m8gdsy6/croot/urllib3_1727769822458/work
 uvicorn @ file:///home/conda/feedstock_root/build_artifacts/uvicorn_1734292939144/work
 uvloop @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_1539mh1ss3/croot/uvloop_1732545180417/work
