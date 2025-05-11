@@ -14,7 +14,7 @@ class KafkaBatchStatsModel(Base):
 
     conf_linger_ms = Column(Float, nullable=True)
     conf_max_request_size = Column(Float, nullable=True)
-    conf_acks = Column(Float, nullable=True)
+    conf_acks = Column(String, nullable=True)
     conf_batch_size = Column(Float, nullable=True)
 
     # Consumer Configurations
