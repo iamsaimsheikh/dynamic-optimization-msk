@@ -44,4 +44,5 @@ def init_db():
     from models.producer_log_model import ProducerLogModel
     from models.sys_event_log_model import SysEventLogModel
     from models.kafka_batch_stats_model import KafkaBatchStatsModel
+    from models.kafka_rl_training_log_model import KafkaRLTrainingLogModel
     Base.metadata.create_all(bind=engine)

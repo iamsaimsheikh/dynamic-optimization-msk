@@ -11,6 +11,7 @@ from kafka_config import (
     DEFAULT_SESSION_TIMEOUT_MS, DEFAULT_HEARTBEAT_INTERVAL_MS,
 )
 from config import BROKERS
+import uuid
 
 tp = MSKTokenProvider()
 
@@ -91,6 +92,7 @@ def create_consumer(brokers, topic_name, consumer_config=None):
         max_poll_records = consumer_config.get("max_poll_records") if consumer_config else DEFAULT_MAX_POLL_RECORDS
         session_timeout_ms = consumer_config.get("session_timeout_ms") if consumer_config else DEFAULT_SESSION_TIMEOUT_MS
         heartbeat_interval_ms = consumer_config.get("heartbeat_interval_ms") if consumer_config else DEFAULT_HEARTBEAT_INTERVAL_MS
+        unique_group_id = f"consumer-{uuid.uuid4()}"
 
         if not BROKERS:
             consumer = KafkaConsumer(
@@ -100,10 +102,10 @@ def create_consumer(brokers, topic_name, consumer_config=None):
                 sasl_mechanism='OAUTHBEARER',
                 sasl_oauth_token_provider=tp,
                 client_id=socket.gethostname(),
-                group_id="my-group",
+                group_id='50x10x1x2000',
                 value_deserializer=lambda v: json.loads(v.decode('utf-8')),
-                auto_offset_reset="earliest",
-                enable_auto_commit=True,
+                auto_offset_reset="latest",
+                enable_auto_commit=False,
                 fetch_max_bytes=fetch_max_bytes,
                 max_poll_records=max_poll_records,
                 session_timeout_ms=session_timeout_ms,
@@ -113,8 +115,9 @@ def create_consumer(brokers, topic_name, consumer_config=None):
             consumer = KafkaConsumer(
                 topic_name,
                 bootstrap_servers=BROKERS,
-                group_id='my-kafka-group',
-                auto_offset_reset='earliest'
+                group_id='50x10x1x2000',
+                auto_offset_reset='latest',
+                enable_auto_commit=False
             )
 
         print("Kafka Consumer created successfully with configurations.")
